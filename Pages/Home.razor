@@ -1,0 +1,214 @@
+﻿@page "/"
+@using MeteoApp.Models
+@using MeteoApp.Services
+@inject NavigationManager Nav
+@inject MeteoApiServices MeteoApiServices
+@inject FavorisServices FavorisService
+@inject login LoginService
+
+<PageTitle>Acceuil Météo</PageTitle>
+
+
+<div class="container mt-4">
+    <h1 class="mb-4">Météo Mondiale 🌤️</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group shadow-sm">
+                <input type="text" class="form-control" placeholder="Entrez une ville (ex: Namur, Tokyo...)"
+                       @bind="searchQuery" @onkeyup="HandleKeyPress" />
+                <button class="btn btn-primary" @onclick="SearchAndGetWeather">
+                    🔍 Rechercher
+                </button>
+            </div>
+            @if (searchError)
+            {
+                <div class="mt-2 text-danger small">
+                    ⚠️ Ville introuvable. Vérifiez l'orthographe.
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="d-flex align-items-center">
+            <div class="spinner-border text-primary me-2" role="status"></div>
+            <span>Recherche en cours...</span>
+        </div>
+    }
+
+    // Si on a des données météo, on les affiche
+    else if (meteo != null && meteo.Current != null)
+    {
+        <div class="card shadow border-0" style="width: 22rem;">
+            <div class="card-body">
+
+                <h3 class="card-title text-primary d-flex align-items-center">
+                    @if (!string.IsNullOrEmpty(currentCountryCode))
+                    {
+                        <img src="https://flagcdn.com/w40/@(currentCountryCode).png" alt="Drapeau" class="me-2 shadow-sm"
+                             style="width: 30px; border-radius: 3px;" />
+                    }
+                    @currentCityName
+                </h3>
+
+                <h5 class="card-subtitle mb-3 text-muted">
+                    @MeteoTrad.GetDescription(meteo.Current.MeteoCode)
+                </h5>
+
+                <div class="display-4 mb-3">@meteo.Current.Temperature°C</div>
+
+                <hr />
+
+
+
+                @if (LoginService.IsLoggedIn)
+                {
+                    <button class="btn btn-outline-success w-100" @onclick="AddToFavorites">
+                        ⭐ Ajouter aux favoris
+                    </button>
+                }
+                else
+                {
+                    <div class="alert alert-info py-2 small">
+                        <a href="/login">Connectez-vous</a> pour ajouter cette ville en favoris.
+                    </div>
+                }
+
+                @if (isSaved)
+                {
+                    <div class="alert alert-success mt-3 py-2 small" role="alert">
+                        ✅ Ajouté aux favoris avec succès !
+                    </div>
+                }
+
+                @if (dejaFavori)
+                {
+                    <div class="alert alert-warning mt-3 py-2 small" role="alert">
+                        ⚠️ Cette ville est déjà dans vos favoris !
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else if (!searchError)
+    {
+        <div class="text-muted">
+            <i class="bi bi-geo-alt"></i> Entrez le nom d'une ville pour découvrir le temps qu'il y fait.
+        </div>
+    }
+</div>
+
+@code {
+
+    // Variables pour stocker les données de la ville et de la météo
+    private string searchQuery = "";
+    private string currentCityName = "";
+    private string currentCountryCode = "";
+    private double currentLat;
+    private double currentLon;
+
+
+    // États pour gérer l'interface utilisateur
+    private bool isLoading = false;
+    private bool searchError = false;
+    private bool isSaved = false;
+    private bool dejaFavori = false;
+
+    private MeteoReponse? meteo;
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SearchAndGetWeather();
+        }
+    }
+
+
+
+    // Méthode pour rechercher une ville et récupérer sa météo
+    private async Task SearchAndGetWeather()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery)) return;
+
+        isLoading = true;
+        searchError = false;
+        isSaved = false;
+        dejaFavori = false;
+        meteo = null;
+        currentCountryCode = "";
+
+
+
+        // On essaie de récupérer les données de la ville recherchée
+        try
+        {
+            var cityData = await MeteoApiServices.SearchCityAsync(searchQuery);
+
+            if (cityData != null)
+            {
+                // On met "Ville (Pays)"
+                currentCityName = $"{cityData.Value.Name} ({cityData.Value.Country})";
+
+                // On récupère le code du pays en minuscule
+                currentCountryCode = cityData.Value.CountryCode.ToLower();
+
+                currentLat = cityData.Value.Lat;
+                currentLon = cityData.Value.Lon;
+
+                meteo = await MeteoApiServices.GetWeatherAsync(currentLat, currentLon);
+            }
+            else
+            {
+                searchError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur : {ex.Message}");
+            searchError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+
+
+
+    // Méthode pour ajouter la ville actuelle aux favoris de l'utilisateur
+    private async Task AddToFavorites()
+    {
+        if (meteo == null || !LoginService.IsLoggedIn) return;
+
+        var favorisActuels = await FavorisService.GetFavorisAsync(LoginService.UserName);
+
+        dejaFavori = favorisActuels.Any(f => f.OriginalName == currentCityName);
+
+        if (dejaFavori)
+        {
+            isSaved = false;
+            return;
+        }
+
+        var favori = new MeteoApp.Models.Favoris
+        {
+            Id = Guid.NewGuid(),
+            OriginalName = currentCityName,
+            Latitude = currentLat,
+            Longitude = currentLon,
+            UserName = LoginService.UserName
+        };
+
+
+
+        // On sauvegarde le favori
+        await FavorisService.SaveFavoriteAsync(favori);
+        isSaved = true;
+        dejaFavori = false;
+        StateHasChanged();
+    }
+}

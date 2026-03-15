@@ -1,0 +1,23 @@
+@page "/login"
+@inject MeteoApp.Services.login loginServices
+@inject NavigationManager Nav
+
+<div class="container mt-5">
+    <div class="card shadow-lg mx-auto" style="max-width: 400px; border-radius: 20px;">
+        <div class="card-body p-5 text-center">
+            <h2 class="mb-4">Connexion</h2>
+            <input type="text" class="form-control mb-3" placeholder="Votre nom" @bind="username" />
+            <button class="btn btn-primary w-100" @onclick="HandleLogin">Se connecter</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string username = "";
+    private void HandleLogin() {
+        if (!string.IsNullOrWhiteSpace(username)) {
+            loginServices.Login(username);
+            Nav.NavigateTo("/");
+        }
+    }
+}

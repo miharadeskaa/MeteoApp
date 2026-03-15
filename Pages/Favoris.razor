@@ -1,0 +1,113 @@
+﻿@page "/favoris"
+@using MeteoApp.Models
+@using MeteoApp.Services
+@inject FavorisServices FavorisService
+@inject NavigationManager Nav
+@inject login loginService
+
+
+
+
+<PageTitle>Mes Favoris</PageTitle>
+
+<div class="container mt-4">
+    <h1 class="mb-4">Mes Villes Favorites ⭐</h1>
+    <p class="text-muted">Vos notes et surnoms sont sauvegardés automatiquement.</p>
+
+    @if (listeDesFavoris == null)
+    {
+        <div class="d-flex align-items-center">
+            <div class="spinner-border text-primary me-2" role="status"></div>
+            <span>Chargement de vos favoris...</span>
+        </div>
+    }
+    else if (!listeDesFavoris.Any())
+    {
+        <div class="alert alert-info shadow-sm">
+            🔎 Vous n'avez pas encore de favoris. 
+            <a href="/" class="alert-link">Retournez à l'accueil</a> pour en ajouter !
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var city in listeDesFavoris)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                @(string.IsNullOrWhiteSpace(city.CustomAlias) ? city.OriginalName : city.CustomAlias)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small mb-3">
+                                <i class="bi bi-geo-alt"></i> Ville d'origine : @city.OriginalName
+                            </p>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Surnom :</label>
+                                <input class="form-control form-control-sm" 
+                                       value="@city.CustomAlias" 
+                                       @onchange="@((e) => { city.CustomAlias = e.Value?.ToString(); UpdateAndSave(city); })" 
+                                       placeholder="Maison, Travail..." />
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Note personnelle :</label>
+                                <textarea class="form-control form-control-sm" 
+                                          value="@city.PersonalNote" 
+                                          @onchange="@((e) => { city.PersonalNote = e.Value?.ToString(); UpdateAndSave(city); })" 
+                                          rows="2" 
+                                          placeholder="Infos utiles..."></textarea>
+                            </div>
+
+                            <div class="text-end">
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteCity(city.Id)">
+                                    🗑️ Supprimer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<MeteoApp.Models.Favoris>? listeDesFavoris;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. SÉCURITÉ : On vérifie si l'utilisateur est bien authentifié
+        if (!loginService.IsLoggedIn)
+        {
+            // S'il n'est pas connecté, on le renvoie à la page de connexion
+            Nav.NavigateTo("/login");
+            return;
+        }
+
+        // 2. Si c'est bon, on charge les données
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        listeDesFavoris = await FavorisService.GetFavorisAsync(loginService.UserName);
+    }
+
+    // Cette méthode est appelée automatiquement dès qu'un champ change
+    private async Task UpdateAndSave(MeteoApp.Models.Favoris item)
+    {
+        await FavorisService.SaveFavoriteAsync(item);
+        // On ne recharge pas toute la liste pour éviter le scintillement de l'écran
+        StateHasChanged(); 
+    }
+
+    private async Task DeleteCity(Guid id)
+    {
+        await FavorisService.DeleteFavoriteAsync(id);
+        await LoadData();
+    }
+}

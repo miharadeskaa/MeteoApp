@@ -1,0 +1,30 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeteoApp", "MeteoApp.csproj", "{D0D3B27E-5565-FE41-BBB0-3857312DBB7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeteoApp.Tests", "MeteoApp.Tests\MeteoApp.Tests.csproj", "{23DE4A15-F4D5-4600-8971-716982D2F1FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0D3B27E-5565-FE41-BBB0-3857312DBB7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0D3B27E-5565-FE41-BBB0-3857312DBB7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0D3B27E-5565-FE41-BBB0-3857312DBB7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0D3B27E-5565-FE41-BBB0-3857312DBB7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23DE4A15-F4D5-4600-8971-716982D2F1FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23DE4A15-F4D5-4600-8971-716982D2F1FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23DE4A15-F4D5-4600-8971-716982D2F1FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23DE4A15-F4D5-4600-8971-716982D2F1FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {065BCBAA-4AA4-4B63-ABEC-F383ED23E787}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,18 @@
+﻿@inherits LayoutComponentBase
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+    <a href="https://open-meteo.com/" target="_blank" style="color: var(--terra); font-weight: 600;" title="Données fournies par Open-Meteo">
+        <i class="bi bi-cloud-sun me-1"></i> API Open-Meteo
+    </a>
+</div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
