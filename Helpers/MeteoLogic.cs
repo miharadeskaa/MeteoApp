@@ -1,3 +1,6 @@
+// fichgier temporaire pour la logique métier de l'application météo
+
+
 namespace MeteoApp.Helpers
 {
     public class MeteoLogic
