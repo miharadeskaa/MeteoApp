@@ -12,4 +12,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.24" PrivateAssets="all" />
   </ItemGroup>
 
+  
+  <ItemGroup>
+  <Compile Remove="MeteoApp.Tests\**" />
+  <Content Remove="MeteoApp.Tests\**" />
+  <EmbeddedResource Remove="MeteoApp.Tests\**" />
+  <None Remove="MeteoApp.Tests\**" />
+</ItemGroup>
 </Project>
