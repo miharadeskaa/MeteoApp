@@ -1,0 +1,14 @@
+# Dossiers de compilation
+bin/
+obj/
+
+# Fichiers de configuration VS Code et Visual Studio
+.vscode/
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Fichiers système
+.DS_Store
+Thumbs.db
