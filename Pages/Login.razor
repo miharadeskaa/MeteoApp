@@ -6,7 +6,16 @@
     <div class="card shadow-lg mx-auto" style="max-width: 400px; border-radius: 20px;">
         <div class="card-body p-5 text-center">
             <h2 class="mb-4">Connexion</h2>
+            
             <input type="text" class="form-control mb-3" placeholder="Votre nom" @bind="username" />
+            
+            <input type="password" class="form-control mb-3" placeholder="Mot de passe" @bind="password" />
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert alert-danger p-2 small">@errorMessage</div>
+            }
+
             <button class="btn btn-primary w-100" @onclick="HandleLogin">Se connecter</button>
         </div>
     </div>
@@ -14,10 +23,21 @@
 
 @code {
     private string username = "";
+    private string password = "";
+    private string errorMessage = "";
+
     private void HandleLogin() {
-        if (!string.IsNullOrWhiteSpace(username)) {
-            loginServices.Login(username);
-            Nav.NavigateTo("/");
+        if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password)) {
+            // Ici on passe le nom ET le mot de passe au service
+            bool isSuccess = loginServices.Login(username, password);
+
+            if (isSuccess) {
+                Nav.NavigateTo("/");
+            } else {
+                errorMessage = "Identifiants incorrects (Essaye 'admin' / '1234')";
+            }
+        } else {
+            errorMessage = "Veuillez remplir tous les champs.";
         }
     }
 }
