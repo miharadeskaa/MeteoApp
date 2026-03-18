@@ -21,4 +21,19 @@ namespace MeteoApp.Tests
             Assert.Equal("bg-danger", resultat);
         }
     }
+
+    public class UnitTest2
+    {
+        // L'accolade manquait ici
+        
+        [Fact]
+        public void NomVilleLogicTest()
+        {
+            // On teste si les villes "Paris" et "Lyon" sont considérées comme différentes
+            string ville1 = "Paris";
+            string ville2 = "Lyon";
+            bool resultat = NomVilleLogic.SontVillesIdentiques(ville1, ville2);
+            Assert.False(resultat);
+        }
+    }
 }
