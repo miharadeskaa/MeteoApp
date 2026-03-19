@@ -19,7 +19,7 @@ builder.Services.AddBlazoredLocalStorage();
 // 2. Enregistrer vos services personnalisés
 builder.Services.AddScoped<MeteoApiServices>();
 builder.Services.AddScoped<FavorisServices>();
-builder.Services.AddScoped<login>();
+builder.Services.AddScoped<LoginService>();
 
 
 // --- FIN DE VOS AJOUTS ---
