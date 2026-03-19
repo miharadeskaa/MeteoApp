@@ -3,7 +3,7 @@
 @using MeteoApp.Services
 @inject FavorisServices FavorisService
 @inject NavigationManager Nav
-@inject login loginService
+@inject LoginService loginService
 
 
 
@@ -76,8 +76,10 @@
 </div>
 
 @code {
-    private List<MeteoApp.Models.Favoris>? listeDesFavoris;
 
+    // Liste des favoris de l'utilisateur connecté
+    private List<MeteoApp.Models.Favoris>? listeDesFavoris;
+        //
     protected override async Task OnInitializedAsync()
     {
         // 1. SÉCURITÉ : On vérifie si l'utilisateur est bien authentifié

@@ -55,15 +55,19 @@
         LoginService.OnChange += StateHasChanged;
     }
 
+
+        // Méthode pour se déconnecter
     private void HandleLogout()
     {
         LoginService.Logout();
         Nav.NavigateTo("/");
     }
 
+
+        
     public void Dispose()
     {
-        // Important pour éviter les erreurs de mémoire
+        
         LoginService.OnChange -= StateHasChanged;
     }
-}
+}y
