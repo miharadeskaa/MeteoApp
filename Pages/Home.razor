@@ -4,7 +4,7 @@
 @inject NavigationManager Nav
 @inject MeteoApiServices MeteoApiServices
 @inject FavorisServices FavorisService
-@inject login LoginService
+@inject LoginService LoginService
 
 <PageTitle>Acceuil Météo</PageTitle>
 
@@ -100,6 +100,8 @@
     }
 </div>
 
+
+
 @code {
 
     // Variables pour stocker les données de la ville et de la météo
@@ -116,13 +118,28 @@
     private bool isSaved = false;
     private bool dejaFavori = false;
 
+
+
+    // Variable pour stocker la réponse météo
     private MeteoReponse? meteo;
 
+
+    // Méthode pour gérer la pression de la touche "Entrée" dans le champ de recherche
     private async Task HandleKeyPress(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
             await SearchAndGetWeather();
+        }
+
+
+    // Réinitialiser les états d'erreur et de chargement lors de la saisie
+        else
+        {
+            searchError = false;
+            isLoading = false;
+            isSaved = false;
+            dejaFavori = false;
         }
     }
 
@@ -142,7 +159,7 @@
 
 
 
-        // On essaie de récupérer les données de la ville recherchée
+        // On teste de rechercher les données de la ville recherchée
         try
         {
             var cityData = await MeteoApiServices.SearchCityAsync(searchQuery);
@@ -165,6 +182,7 @@
                 searchError = true;
             }
         }
+        // En cas d'erreur (ex: problème de connexion), on affiche un message d'erreur
         catch (Exception ex)
         {
             Console.WriteLine($"Erreur : {ex.Message}");
@@ -175,8 +193,6 @@
             isLoading = false;
         }
     }
-
-
 
 
     // Méthode pour ajouter la ville actuelle aux favoris de l'utilisateur
@@ -194,6 +210,8 @@
             return;
         }
 
+
+    // On crée un nouvel objet Favoris avec les données de la ville actuelle
         var favori = new MeteoApp.Models.Favoris
         {
             Id = Guid.NewGuid(),
@@ -202,7 +220,6 @@
             Longitude = currentLon,
             UserName = LoginService.UserName
         };
-
 
 
         // On sauvegarde le favori
