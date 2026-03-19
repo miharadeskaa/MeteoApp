@@ -1,5 +1,6 @@
 @page "/login"
-@inject MeteoApp.Services.login loginServices
+@using MeteoApp.Services
+@inject LoginService loginServices
 @inject NavigationManager Nav
 
 <div class="container mt-5">
@@ -27,17 +28,15 @@
     private string errorMessage = "";
 
     private void HandleLogin() {
-        if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password)) {
-            // Ici on passe le nom ET le mot de passe au service
-            bool isSuccess = loginServices.Login(username, password);
+        
+        
+        bool isSuccess = loginServices.Login(username, password);
 
-            if (isSuccess) {
-                Nav.NavigateTo("/");
-            } else {
-                errorMessage = "Identifiants incorrects (Essaye 'admin' / '1234')";
-            }
+        if (isSuccess) {
+            Nav.NavigateTo("/");
         } else {
-            errorMessage = "Veuillez remplir tous les champs.";
+            
+            errorMessage = "Identifiants incorrects (Essaye 'admin' / 'Admin@2026')";
         }
     }
 }
