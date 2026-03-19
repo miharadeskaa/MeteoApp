@@ -1,5 +1,6 @@
 using Xunit;
 using MeteoApp.Helpers;
+using MeteoApp.Pages;
 
 namespace MeteoApp.Tests
 {
@@ -24,7 +25,7 @@ namespace MeteoApp.Tests
 
     public class UnitTest2
     {
-        // L'accolade manquait ici
+        
         
         [Fact]
         public void NomVilleLogicTest()
@@ -36,4 +37,30 @@ namespace MeteoApp.Tests
             Assert.False(resultat);
         }
     }
+        // tester les logins
+    public class UnitTest3
+        {   
+            [Fact]
+            public void TestLoginValide()
+            {
+                // On teste si le login "admin" avec le mot de passe correct fonctionne
+                var service = new MeteoApp.Services.LoginService();
+                bool resultat = service.Login("admin", "Admin@2026");
+                Assert.True(resultat);
+                Assert.True(service.IsLoggedIn);
+                Assert.Equal("admin", service.UserName);
+            }
+
+            [Fact]
+            public void TestLoginInvalide()
+            {
+                // On teste si un login avec un mot de passe incorrect échoue
+                var service = new MeteoApp.Services.LoginService();
+                bool resultat = service.Login("admin", "wrongpassword");
+                Assert.False(resultat);
+                Assert.False(service.IsLoggedIn);
+                Assert.Equal("", service.UserName);
+            }
+        }
+        
 }
