@@ -3,7 +3,7 @@ namespace MeteoApp.Helpers
 
 
 { 
-// Ajout de la classe MeteoLogic pour les tests unitaires (Couleur selon la température)
+// Ajout de la classe MeteoLogic pour les tests unitaires
     public class MeteoLogic
     {
         public static string ObtenirCouleurTemperature(double temp)
@@ -17,7 +17,7 @@ namespace MeteoApp.Helpers
 
 
 
-// Ajout de la classe NomVilleLogic pour les tests unitaires (Villes identiques ou non)
+// Ajout de la classe NomVilleLogic pour les tests unitaires 
     public class NomVilleLogic
     {
         public static bool SontVillesIdentiques(string ville1, string ville2)
