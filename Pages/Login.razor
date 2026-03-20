@@ -1,45 +1,142 @@
 @page "/login"
 @using MeteoApp.Services
-@inject LoginService loginServices
+@inject LoginService AuthService
 @inject NavigationManager Nav
 
+<PageTitle>Connexion / Inscription</PageTitle>
+
 <div class="container mt-5">
-    <div class="card shadow-lg mx-auto" style="max-width: 400px; border-radius: 20px;">
-        <div class="card-body p-5 text-center">
-            <h2 class="mb-4">Connexion</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-5 card p-4 shadow-sm" style="border-radius: 15px;">
             
-            <input type="text" class="form-control mb-3" placeholder="Votre nom" @bind="username" />
-            
-            <input type="password" class="form-control mb-3" placeholder="Mot de passe" @bind="password" />
+            <h3 class="text-center mb-4 text-primary">
+                @(isRegisterMode ? "Créer un compte" : "Connexion")
+            </h3>
+
+            <div class="mb-3">
+                <label class="form-label">Nom d'utilisateur</label>
+                <input class="form-control" @bind="username" placeholder="Entrez votre nom" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" @bind="password" placeholder="Votre mot de passe" />
+            </div>
+
+            @if (isRegisterMode)
+            {
+                <div class="mb-3">
+                    <label class="form-label">Confirmer le mot de passe</label>
+                    <input type="password" class="form-control" @bind="confirmPassword" placeholder="Retapez le mot de passe" />
+                </div>
+            }
 
             @if (!string.IsNullOrEmpty(errorMessage))
             {
-                <div class="alert alert-danger p-2 small">@errorMessage</div>
+                <div class="alert alert-danger p-2 small text-center">
+                    ⚠️ @errorMessage
+                </div>
             }
 
-            <button class="btn btn-primary w-100" @onclick="HandleLogin">Se connecter</button>
+            @if (!string.IsNullOrEmpty(successMessage))
+            {
+                <div class="alert alert-success p-2 small text-center">
+                    ✅ @successMessage
+                </div>
+            }
+
+            <button class="btn btn-primary w-100 mb-3" @onclick="ExecuteAction">
+                @(isRegisterMode ? "S'inscrire" : "Se connecter")
+            </button>
+
+            <div class="text-center">
+                <button class="btn btn-link btn-sm text-decoration-none" @onclick="ToggleMode">
+                    @(isRegisterMode ? "Déjà un compte ? Connectez-vous" : "Nouveau ? Créez un compte")
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
 
 @code {
-    // Propriétés pour stocker les entrées de l'utilisateur et les messages d'erreur
     private string username = "";
     private string password = "";
+    private string confirmPassword = "";
+    
     private string errorMessage = "";
+    private string successMessage = "";
+    
+    private bool isRegisterMode = false;
 
-
-    // Méthode pour gérer la connexion
-    private void HandleLogin() {
+    protected override async Task OnInitializedAsync()
+    {
         
-        
-        bool isSuccess = loginServices.Login(username, password);
+        await AuthService.InitialiserAsync();
+    }
 
-        if (isSuccess) {
-            Nav.NavigateTo("/");
-        } else {
+    // Méthode pour basculer entre l'écran de Connexion et l'écran d'Inscription
+    private void ToggleMode()
+    {
+        isRegisterMode = !isRegisterMode;
+        errorMessage = "";
+        successMessage = "";
+        password = "";
+        confirmPassword = "";
+    }
+
+    private async Task ExecuteAction()
+    {
+        errorMessage = "";
+        successMessage = "";
+
+        if (isRegisterMode)
+        {
+            // 1. VÉRIFICATION : Est-ce que les deux mots de passe sont identiques ?
+            if (password != confirmPassword)
+            {
+                errorMessage = "Les mots de passe ne correspondent pas.";
+                return; 
+            }
+
+            // 2. VÉRIFICATION : Est-ce que le mot de passe n'est pas vide ?
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                errorMessage = "Le mot de passe ne peut pas être vide.";
+                return;
+            }
+
+            // 3. ON TENTE L'INSCRIPTION 
+            bool success = await AuthService.InscrireAsync(username, password);
             
-            errorMessage = "Identifiants incorrects (Essaye 'admin' / 'Admin@2026')";
+            if (success)
+            {
+                successMessage = "Compte créé avec succès ! Vous pouvez maintenant vous connecter.";
+                isRegisterMode = false; 
+                password = ""; 
+                confirmPassword = "";
+            }
+            else
+            {
+                errorMessage = AuthService.MessageErreur;
+            }
+        }
+        else
+        {
+            
+            bool success = AuthService.Login(username, password);
+            if (success)
+            {
+                Nav.NavigateTo("/");
+            }
+            else
+            {
+                errorMessage = AuthService.MessageErreur;
+                if (string.IsNullOrEmpty(errorMessage))
+                {
+                    errorMessage = "Identifiants incorrects.";
+                }
+            }
         }
     }
 }
